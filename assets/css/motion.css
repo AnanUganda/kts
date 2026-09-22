@@ -1,0 +1,34 @@
+/* Kazo Technical School — motion styles.
+   Hidden start states apply ONLY while <html> has .js-anim (added by the inline head script,
+   never when reduced motion is on or JavaScript is off). Only opacity/transform are used. */
+
+/* Lenis (from lenis@1.3.26/dist/lenis.css) */
+html.lenis, html.lenis body { height: auto; }
+.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
+.lenis [data-lenis-prevent], .lenis [data-lenis-prevent-wheel], .lenis [data-lenis-prevent-touch],
+.lenis [data-lenis-prevent-vertical], .lenis [data-lenis-prevent-horizontal] { overscroll-behavior: contain; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
+.lenis.lenis-smooth .video iframe, .lenis.lenis-smooth .map iframe { pointer-events: auto; } /* keep embeds clickable */
+.lenis.lenis-autoToggle { transition-property: overflow; transition-duration: 1ms; transition-behavior: allow-discrete; }
+/* Lenis drives scrolling; the CSS smooth scroll in site.css must be off while it runs */
+html.lenis { scroll-behavior: auto !important; }
+
+/* Start states */
+.js-anim [data-anim~="words"] { visibility: hidden; }
+.js-anim [data-anim~="fade-up"] { opacity: 0; transform: translateY(20px); }
+.js-anim [data-anim~="image"] { opacity: 0; }
+.js-anim [data-anim~="image"] img { transform: scale(1.06); }
+.js-anim [data-anim~="image"][data-anim~="parallax"] img { transform: scale(1.14); }
+.js-anim [data-anim~="parallax"] img { will-change: transform; }
+
+/* Anything inside a fade-up block moves with the block, never on its own */
+.js-anim [data-anim~="fade-up"] [data-anim] { opacity: 1; transform: none; visibility: visible; }
+.js-anim [data-anim~="fade-up"] [data-anim] img { transform: none; }
+
+/* Split words: inline-block so they can move; keeps normal wrapping */
+[data-anim~="words"] .word, [data-anim~="words"] > div { will-change: transform, opacity; }
+
+@media (prefers-reduced-motion: reduce) {
+  .js-anim [data-anim] { opacity: 1 !important; transform: none !important; visibility: visible !important; }
+  .js-anim [data-anim] img { transform: none !important; }
+}
