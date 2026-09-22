@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Registration Fee | Kazo Technical School</title>
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <style>
+    .payment-card {
+      max-width: 580px;
+      margin: 40px auto;
+      padding: 32px;
+      background: #ffffff;
+      border: 1px solid var(--border, #e5e5e5);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 1rem;
+      border: 1.5px solid #d1d5db;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      box-sizing: border-box;
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: #710014;
+      box-shadow: 0 0 0 3px rgba(113, 0, 20, 0.15);
+    }
+    .fee-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fdf2f2;
+      color: #710014;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: #710014;
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    .btn-submit:hover:not(:disabled) {
+      background: #56000f;
+    }
+    .btn-submit:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    .status-banner {
+      margin-top: 20px;
+      padding: 14px 18px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .status-banner--info {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+    }
+    .status-banner--pending {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      animation: pulse 2s infinite;
+    }
+    .status-banner--error {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+    }
+    .error-box {
+      margin-bottom: 16px;
+      padding: 12px;
+      background: #fef2f2;
+      color: #b91c1c;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      border: 1px solid #fecaca;
+    }
+    .success-box {
+      text-align: center;
+      padding: 36px 24px;
+      background: #f0fdf4;
+      border: 2px solid #86efac;
+      border-radius: 16px;
+      color: #166534;
+    }
+    .success-box svg {
+      width: 64px;
+      height: 64px;
+      color: #16a34a;
+      margin-bottom: 16px;
+    }
+    .success-box h3 {
+      font-size: 1.6rem;
+      margin: 0 0 8px;
+      color: #15803d;
+    }
+    .success-box p {
+      font-size: 1rem;
+      margin: 4px 0 16px;
+      color: #166534;
+    }
+    .success-details {
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid #dcfce7;
+      text-align: left;
+      font-size: 0.9rem;
+      margin-top: 16px;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.75; }
+    }
+  </style>
+</head>
+<body style="background: #fafaf9; font-family: 'Urbanist', -apple-system, sans-serif;">
+  <div class="container">
+    <div class="payment-card">
+      <div class="fee-badge">
+        <span>Registration Fee: UGX 35,000</span>
+      </div>
+      <h2>Complete Student Registration</h2>
+      <p style="color: #666; margin-bottom: 24px;">
+        Enter the student's details and phone number. A secure Mobile Money prompt will be sent directly to your phone.
+      </p>
+
+      <div id="reg-error-container" class="error-box" hidden></div>
+
+      <!-- Registration Form -->
+      <form id="registration-form" novalidate>
+        <div class="form-group">
+          <label for="student_name">Student's Full Name *</label>
+          <input type="text" id="student_name" name="student_name" placeholder="e.g., Mukasa Ronald" required>
+        </div>
+
+        <div class="form-group">
+          <label for="phone_number">Mobile Money Phone Number *</label>
+          <input type="tel" id="phone_number" name="phone_number" placeholder="e.g., 0771234567 or 0701234567" required>
+          <small style="display:block; color:#777; margin-top:4px;">Supports MTN Mobile Money and Airtel Money Uganda</small>
+        </div>
+
+        <div class="form-group">
+          <label for="network">Network Provider (Optional)</label>
+          <select id="network" name="network">
+            <option value="">Auto-detect from phone number</option>
+            <option value="MTN">MTN MoMo</option>
+            <option value="AIRTEL">Airtel Money</option>
+          </select>
+        </div>
+
+        <button type="submit" id="reg-submit-btn" class="btn-submit">
+          <span id="reg-btn-text">Pay Registration (UGX 35,000)</span>
+        </button>
+      </form>
+
+      <!-- Status Banner (Shown during submission & polling) -->
+      <div id="reg-status-container" class="status-banner" hidden>
+        <span id="reg-status-message"></span>
+      </div>
+
+      <!-- Green Success Message (Shown when status is 'paid') -->
+      <div id="reg-success-container" class="success-box" hidden>
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <h3>Registration Confirmed!</h3>
+        <p>Your registration payment of <strong>UGX 35,000</strong> has been successfully received and confirmed.</p>
+        <div class="success-details">
+          <div><strong>Student:</strong> <span class="success-student-name"></span></div>
+          <div><strong>Reference:</strong> <span class="success-tx-ref" style="font-family: monospace;"></span></div>
+          <div><strong>Status:</strong> <span style="color:#16a34a; font-weight:700;">Paid</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/js/registration-payment.js"></script>
+</body>
+</html>

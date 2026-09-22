@@ -1,0 +1,16 @@
+{
+  "name": "kts-website-build",
+  "version": "1.0.0",
+  "description": "Kazo Technical School website with serverless payment processing",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.1",
+    "flutterwave-node-v3": "^1.1.12"
+  },
+  "devDependencies": {
+    "vercel": "^39.0.0"
+  }
+}
