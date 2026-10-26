@@ -7,6 +7,9 @@ if (!flwPublicKey || !flwSecretKey) {
   console.warn('Warning: FLW_PUBLIC_KEY or FLW_SECRET_KEY is not defined in environment variables.');
 }
 
-const flw = new Flutterwave(flwPublicKey || '', flwSecretKey || '');
+const flw = new Flutterwave(
+  flwPublicKey || 'FLWPUBK_TEST-placeholder-X',
+  flwSecretKey || 'FLWSECK_TEST-placeholder-X'
+);
 
 module.exports = { flw };

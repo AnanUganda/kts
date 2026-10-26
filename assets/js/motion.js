@@ -119,8 +119,7 @@
     if (nested(el)) return;
     var img = el.querySelector('img') || el;
     var tl = gsap.timeline({ scrollTrigger: Object.assign({ trigger: el }, ONCE) });
-    tl.to(el, { opacity: 1, duration: 1, ease: 'power2.out' }, 0)
-      .fromTo(img, { scale: has(el, 'parallax') ? 1.14 : 1.06 }, { scale: has(el, 'parallax') ? 1.08 : 1, duration: 1, ease: 'power2.out' }, 0);
+    tl.fromTo(img, { scale: has(el, 'parallax') ? 1.14 : 1.06 }, { scale: has(el, 'parallax') ? 1.08 : 1, duration: 1, ease: 'power2.out' }, 0);
   });
 
   // Parallax: desktop with a fine pointer only; image is pre-scaled so edges never show.

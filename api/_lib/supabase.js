@@ -7,11 +7,15 @@ if (!supabaseUrl || !supabaseServiceRoleKey) {
   console.warn('Warning: SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not defined in environment variables.');
 }
 
-const supabaseAdmin = createClient(supabaseUrl || '', supabaseServiceRoleKey || '', {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-  },
-});
+const supabaseAdmin = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseServiceRoleKey || 'placeholder-key',
+  {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  }
+);
 
 module.exports = { supabaseAdmin };

@@ -89,6 +89,57 @@
       f.addEventListener('input', function () { if (f.getAttribute('aria-invalid')) showError(f, f.checkValidity() ? '' : errorText(f)); });
       f.addEventListener('change', function () { if (f.getAttribute('aria-invalid')) showError(f, f.checkValidity() ? '' : errorText(f)); });
     });
+    // Which kind of enquiry this form is, from its id (see api/enquiry.js)
+    function formKind() {
+      var id = form.id || '';
+      if (id.indexOf('book') === 0) return 'booking';
+      if (id.indexOf('question') === 0) return 'question';
+      if (id.indexOf('pack') === 0) return 'pack';
+      if (id.indexOf('apply') === 0) return 'application';
+      if (form.hasAttribute('data-wa-intro') && /order/i.test(form.dataset.waIntro || '')) return 'order';
+      return 'other';
+    }
+
+    // Answers, labelled exactly as the visitor saw them
+    function collect() {
+      var answers = {}, picked = { name: '', phone: '', email: '', message: '' };
+      fields.forEach(function (f) {
+        if (!f.name || !f.value.trim()) return;
+        var label = labelFor(f), value = f.value.trim();
+        answers[label] = value;
+        var key = f.name.toLowerCase();
+        if (!picked.email && (f.type === 'email' || key.indexOf('email') > -1)) picked.email = value;
+        else if (!picked.phone && (f.type === 'tel' || /whatsapp|phone|contact/.test(key))) picked.phone = value;
+        if (!picked.name && /^(name|first|full)/.test(key)) picked.name = value;
+        if (!picked.message && /question|message|note/.test(key)) picked.message = value;
+      });
+      if (!picked.message) picked.message = form.dataset.waIntro || '';
+      return { answers: answers, picked: picked };
+    }
+
+    function whatsappUrl(answers) {
+      var lines = [form.dataset.waIntro || ''];
+      Object.keys(answers).forEach(function (label) { lines.push(label + ': ' + answers[label]); });
+      return 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(lines.join('\n'));
+    }
+
+    function handOffToWhatsApp(url) {
+      var win = window.open(url, '_blank', 'noopener');
+      if (form.dataset.redirect) window.location.href = form.dataset.redirect;
+      else if (!win) window.location.href = url;
+    }
+
+    function showSent(url) {
+      if (form.dataset.redirect) { window.location.href = form.dataset.redirect; return; }
+      var done = document.createElement('div');
+      done.className = 'form-done';
+      done.setAttribute('role', 'status');
+      done.innerHTML = '<p><strong>Thank you, we have your details.</strong> We have opened WhatsApp so you can send them to us directly. We reply within two working days.</p>' +
+        '<p><a class="btn btn--soft" href="' + url + '" target="_blank" rel="noopener">Open WhatsApp again</a></p>';
+      form.parentNode.replaceChild(done, form);
+      done.focus && done.focus();
+    }
+
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       var firstBad = null;
@@ -99,19 +150,44 @@
         if (!ok && !firstBad) firstBad = f;
       });
       if (firstBad) { firstBad.focus(); return; }
-      var lines = [form.dataset.waIntro || ''];
-      fields.forEach(function (f) {
-        if (!f.name || !f.value.trim()) return;
-        lines.push(labelFor(f) + ': ' + f.value.trim());
-      });
-      var url = 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(lines.join('\n'));
+
+      var data = collect(), url = whatsappUrl(data.answers);
+
+      // 1. Save a copy to the database. keepalive lets it finish even if the page navigates.
+      try {
+        fetch('/api/enquiry', {
+          method: 'POST',
+          keepalive: true,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            form: formKind(),
+            page: location.pathname,
+            name: data.picked.name,
+            phone: data.picked.phone,
+            email: data.picked.email,
+            message: data.picked.message,
+            answers: data.answers,
+            website: form.querySelector('[name=website]') ? form.querySelector('[name=website]').value : ''
+          })
+        }).catch(function () {});
+      } catch (err) { /* saving must never block the message */ }
+
+      // 2. Hand off to WhatsApp straight away, while this is still the visitor's own click,
+      //    so the new tab is not treated as a pop-up.
       var win = window.open(url, '_blank', 'noopener');
-      if (form.dataset.redirect) {
-        window.location.href = form.dataset.redirect;
-      } else if (!win) {
-        window.location.href = url;
-      }
+      if (form.dataset.redirect) { window.location.href = form.dataset.redirect; return; }
+      if (!win) { window.location.href = url; return; }
+      showSent(url);
     });
+
+    // Honeypot: hidden from people, tempting to bots
+    if (!form.querySelector('[name=website]')) {
+      var trap = document.createElement('div');
+      trap.setAttribute('aria-hidden', 'true');
+      trap.style.cssText = 'position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden';
+      trap.innerHTML = '<label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>';
+      form.appendChild(trap);
+    }
   });
 
   // "Save Saturday to My Phone": build a calendar file for the coming Saturday, 9–11am Kampala time (UTC+3)
@@ -269,4 +345,30 @@
   }, { passive: true });
   header.addEventListener('focusin', function () { header.classList.remove('is-hidden'); });
   update();
+})();
+
+/* Image safety net: some browsers claim AVIF support but fail to decode it, leaving a blank
+   frame. If an image fails or decodes to nothing, drop the AVIF sources and use the JPEG. */
+(function () {
+  'use strict';
+  function useJpeg(img) {
+    var pic = img.parentElement;
+    if (!pic || pic.tagName !== 'PICTURE' || img.dataset.jpegFallback) return;
+    img.dataset.jpegFallback = '1';
+    Array.prototype.slice.call(pic.querySelectorAll('source')).forEach(function (s) { s.parentNode.removeChild(s); });
+    var srcset = img.getAttribute('srcset'), sizes = img.getAttribute('sizes'), src = img.getAttribute('src');
+    img.removeAttribute('srcset');
+    if (srcset) img.setAttribute('srcset', srcset);
+    if (sizes) img.setAttribute('sizes', sizes);
+    img.setAttribute('src', src);
+  }
+  function check(img) { if (img.complete && img.naturalWidth === 0) useJpeg(img); }
+  Array.prototype.slice.call(document.querySelectorAll('picture img')).forEach(function (img) {
+    img.addEventListener('error', function () { useJpeg(img); });
+    if (img.complete) check(img);
+    else img.addEventListener('load', function () { check(img); });
+  });
+  window.addEventListener('load', function () {
+    Array.prototype.slice.call(document.querySelectorAll('picture img')).forEach(check);
+  });
 })();

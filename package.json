@@ -4,13 +4,15 @@
   "description": "Kazo Technical School website with serverless payment processing",
   "main": "index.html",
   "scripts": {
-    "dev": "vercel dev"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",
     "flutterwave-node-v3": "^1.1.12"
   },
   "devDependencies": {
+    "express": "^5.2.1",
     "vercel": "^39.0.0"
   }
 }

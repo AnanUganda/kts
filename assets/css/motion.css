@@ -16,7 +16,7 @@ html.lenis { scroll-behavior: auto !important; }
 /* Start states */
 .js-anim [data-anim~="words"] { visibility: hidden; }
 .js-anim [data-anim~="fade-up"] { opacity: 0; transform: translateY(20px); }
-.js-anim [data-anim~="image"] { opacity: 0; }
+/* images are never hidden: only the gentle scale settles them in */
 .js-anim [data-anim~="image"] img { transform: scale(1.06); }
 .js-anim [data-anim~="image"][data-anim~="parallax"] img { transform: scale(1.14); }
 .js-anim [data-anim~="parallax"] img { will-change: transform; }

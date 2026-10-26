@@ -1,4 +1,5 @@
 /* Kazo Technical School — site styles. Mobile-first. */
+@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
 
 :root {
   /* Brand palette */
@@ -28,8 +29,9 @@
   --error: #B42318;
 
   --font: "Urbanist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --fs-h1: clamp(2.375rem, 1.6rem + 3.3vw, 4rem);
-  --fs-h2: clamp(1.875rem, 1.35rem + 2.25vw, 3rem);
+  --font-display: "TT Bluescreens", "Anton", Impact, "Arial Narrow", sans-serif;
+  --fs-h1: clamp(2.85rem, 2rem + 4.4vw, 5.25rem);
+  --fs-h2: clamp(2.2rem, 1.6rem + 2.8vw, 3.75rem);
   --fs-h3: clamp(1.25rem, 1.12rem + 0.55vw, 1.625rem);
   --fs-lead: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
   --fs-body: clamp(1rem, 0.97rem + 0.12vw, 1.0625rem);
@@ -59,11 +61,21 @@ body {
   background: var(--bg);
   padding-bottom: var(--mbar-h);
   overflow-x: hidden;
+  font-size-adjust: from-font;
 }
 img, svg { display: block; max-width: 100%; }
 h1, h2, h3, h4 { color: var(--ink); font-weight: 600; line-height: 1.1; letter-spacing: -0.02em; margin: 0 0 0.5em; text-wrap: balance; }
+h1, h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 0.98;
+  letter-spacing: 0.015em;
+  margin: 0 0 0.38em;
+  font-size-adjust: cap-height from-font;
+}
 h1 { font-size: var(--fs-h1); }
-h2 { font-size: var(--fs-h2); font-weight: 500; }
+h2 { font-size: var(--fs-h2); }
 h3 { font-size: var(--fs-h3); font-weight: 600; letter-spacing: -0.01em; line-height: 1.2; }
 p { margin: 0 0 1em; }
 p:last-child { margin-bottom: 0; }
@@ -625,8 +637,8 @@ mark.todo { background: #FFF1B8; color: #5C4400; padding: 0 4px; border-radius: 
 .meals__icon { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 10px; background: rgba(255,255,255,.14); color: #fff; }
 .meals a { color: #fff; }
 @media (min-width: 1024px) {
-  .cost { align-items: center; }
-  .cost > .photo { aspect-ratio: 4 / 5 !important; }
+  .cost { align-items: start; }
+  .cost > .photo { aspect-ratio: 4 / 5 !important; align-self: start; }
   .cost > .photo img { object-position: 60% center; }
 }
 
@@ -734,3 +746,43 @@ mark.todo { background: #FFF1B8; color: #5C4400; padding: 0 4px; border-radius: 
    (Safari can resolve height:100% on an in-flow img to 0 inside grid/flex cells.) */
 .photo { position: relative; }
 .photo img { position: absolute; inset: 0; }
+.footer__credit { display: block; margin-top: 4px; }
+.footer__credit a { color: var(--sand-light); text-decoration: none; }
+.footer__credit a:hover { color: #fff; text-decoration: underline; }
+.form-done { background: var(--surface); border-radius: var(--radius); padding: 24px; }
+.form-done p { margin: 0 0 14px; }
+.form-done p:last-child { margin: 0; }
+
+/* ---------- Industrial Condensed Display Typography Overrides ---------- */
+.hero h1 { line-height: 1.02; }
+.hero .accent { padding: 0.02em 0.18em; border-radius: 4px; }
+@media (max-width: 767.98px) {
+  .hero h1 { font-size: clamp(2.35rem, 1.6rem + 3.8vw, 3rem); }
+}
+@media (min-width: 768px) and (max-height: 820px) {
+  .hero h1 { font-size: clamp(2.75rem, 1.8rem + 3.2vw, 4rem); }
+}
+.hero__stat-num,
+.stat__num,
+.proof__num,
+.step::before {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+.mission h2 {
+  font-family: var(--font);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  letter-spacing: .12em;
+  line-height: 1.3;
+}
+.footer__h {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.375rem;
+  letter-spacing: 0.03em;
+}
+/* Header: Book sits beside Apply on wide screens only, so the bar never crowds */
+.header__cta--book { display: none; }
+@media (min-width: 1200px) { .header__cta--book { display: inline-flex; } }
