@@ -21,7 +21,9 @@
   --ink: #161616;            /* headings */
   --ink-2: #2E2A28;          /* dark button hover */
   --text: #57534E;           /* body text (7.6:1 on white) */
-  --bg: #FFFFFF;
+  --bg: #FDFCFA;             /* never pure white: warm off-white */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);        /* power4.out */
+  --ease-inout: cubic-bezier(0.76, 0, 0.24, 1); /* dramatic */
   --surface: var(--pearl);
   --surface-2: #E8E5DE;
   --line: #DEDAD2;
@@ -39,13 +41,15 @@
 
   --gutter: 20px;
   --section: 64px;
+  --section-sm: 44px;
+  --section-lg: 88px;
   --radius: 12px;
   --radius-lg: 16px;
   --max: 1320px;
   --mbar-h: 0px;
 }
-@media (min-width: 768px) { :root { --gutter: 32px; --section: 96px; } }
-@media (min-width: 1280px) { :root { --gutter: 60px; --section: 120px; } }
+@media (min-width: 768px) { :root { --gutter: 32px; --section: 96px; --section-sm: 64px; --section-lg: 128px; } }
+@media (min-width: 1280px) { :root { --gutter: 60px; --section: 120px; --section-sm: 80px; --section-lg: 168px; } }
 @media (max-width: 767.98px) { :root { --mbar-h: 76px; } }
 
 /* ---------- Base ---------- */
@@ -75,6 +79,7 @@ h1, h2 {
   font-size-adjust: cap-height from-font;
 }
 h1 { font-size: var(--fs-h1); }
+h1, h2 { line-height: 0.93; letter-spacing: 0.005em; }
 h2 { font-size: var(--fs-h2); }
 h3 { font-size: var(--fs-h3); font-weight: 600; letter-spacing: -0.01em; line-height: 1.2; }
 p { margin: 0 0 1em; }
@@ -786,3 +791,50 @@ mark.todo { background: #FFF1B8; color: #5C4400; padding: 0 4px; border-radius: 
 /* Header: Book sits beside Apply on wide screens only, so the bar never crowds */
 .header__cta--book { display: none; }
 @media (min-width: 1200px) { .header__cta--book { display: inline-flex; } }
+
+/* ============================================================
+   Craft pass — rhythm, numerals, motion, selection
+   ============================================================ */
+
+/* Rhythm: sections should not all breathe identically.
+   Tighter straight after the proof strip, generous around the closing call to action. */
+.proof + .section { padding-block: var(--section-sm) var(--section); }
+.section:has(> .container > .cta) { padding-block: var(--section-lg); }
+.page-hero + .section { padding-block: var(--section-sm) var(--section); }
+
+/* Numerals: figures are content here (fees, 94%, step numbers), so give them the display face
+   and tabular spacing so columns of digits line up. */
+.fee__amt, .price-pair__amt, .stat__num, .hero__stat-num, .proof__num, .tier__amt, .product__price, .big-line {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+}
+.table td { font-variant-numeric: tabular-nums; }
+.step::before { font-family: var(--font-display); font-weight: 400; letter-spacing: 0.02em; }
+
+/* Motion: one easing curve across the site, instead of the browser default */
+.btn, .card, .tier, .product, .team-card, .xcard, .fee, .value, .photo img, .faq summary .icon {
+  transition-timing-function: var(--ease);
+}
+
+/* Hover lift: only where there is a real pointer, so nothing sticks on touch */
+@media (hover: hover) and (pointer: fine) {
+  .card, .tier, .team-card, .product, .value {
+    transition: transform .4s var(--ease), background-color .3s var(--ease);
+  }
+  .card:hover, .tier:hover, .team-card:hover, .product:hover, .value:hover { transform: translateY(-3px); }
+  .link-arrow .icon { transition: transform .3s var(--ease); }
+  .link-arrow:hover .icon { transform: translateX(4px); }
+}
+
+/* Selection: brand, not browser blue */
+::selection { background: var(--crimson); color: var(--pearl); }
+
+/* Eyebrow rule grows on the heading it introduces */
+.tag::before { transition: width .5s var(--ease); }
+
+@media (prefers-reduced-motion: reduce) {
+  .card:hover, .tier:hover, .team-card:hover, .product:hover, .value:hover { transform: none; }
+}
+.fee__includes li > span { min-width: 0; }
